@@ -1,0 +1,291 @@
+/* ============ Fonts ============ */
+@font-face {
+  font-family: "Cinzel";
+  src: url("../assets/fonts/Cinzel-Variable.ttf") format("truetype");
+  font-weight: 400 900;
+}
+
+:root{
+  --green-900:#1f3d2b;
+  --green-800:#28492f;
+  --green-700:#33593b;
+  --green-600:#3f6b47;
+  --green-500:#4f7d56;
+  --green-100:#e7efe4;
+  --green-50:#f2f7ef;
+  --gold:#c79a3d;
+  --cream:#fbf8f1;
+  --text-dark:#1f2b22;
+  --radius:18px;
+  --shadow: 0 6px 24px rgba(31,61,43,0.10);
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:"Vazirmatn", sans-serif;
+  background: linear-gradient(180deg, var(--green-50) 0%, #eef4ea 100%);
+  color:var(--text-dark);
+  min-height:100vh;
+}
+
+.page{
+  max-width:520px;
+  margin:0 auto;
+  padding:20px 16px 40px;
+}
+
+/* ============ Header ============ */
+.app-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:8px 4px 20px;
+}
+.app-header .logo{
+  width:52px;
+  height:auto;
+  flex-shrink:0;
+}
+.header-text h1{
+  font-size:17px;
+  margin:0;
+  color:var(--green-900);
+  font-weight:800;
+}
+.header-text span{
+  font-size:12.5px;
+  color:var(--green-600);
+}
+
+/* ============ Cards ============ */
+.card{
+  background:#ffffff;
+  border:1px solid var(--green-100);
+  border-radius:var(--radius);
+  padding:20px 18px;
+  margin-bottom:18px;
+  box-shadow:var(--shadow);
+}
+.card-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:4px;
+}
+.card-title .icon{font-size:19px;}
+.card-title h2{
+  font-size:16px;
+  margin:0;
+  color:var(--green-900);
+  font-weight:700;
+}
+.card-sub{
+  font-size:12.5px;
+  color:#7a8a7d;
+  margin:2px 0 16px;
+}
+
+/* ============ Template selector ============ */
+.template-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.template-option{
+  border:2px solid var(--green-100);
+  border-radius:14px;
+  padding:10px 10px 12px;
+  cursor:pointer;
+  text-align:center;
+  transition:.15s;
+  position:relative;
+  background:var(--green-50);
+}
+.template-option:hover{border-color:var(--green-500);}
+.template-option.selected{
+  border-color:var(--green-700);
+  background:#fff;
+}
+.template-option img{
+  width:100%;
+  border-radius:8px;
+  display:block;
+  margin-bottom:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);
+}
+.template-option .tname{
+  font-size:13px;
+  font-weight:700;
+  color:var(--green-900);
+}
+.template-option .check{
+  position:absolute;
+  top:8px;
+  right:8px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:var(--green-700);
+  color:#fff;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+}
+.template-option.selected .check{display:flex;}
+
+/* ============ Form ============ */
+.cert-form{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.form-group label{
+  display:block;
+  font-size:13px;
+  font-weight:600;
+  color:var(--green-800);
+  margin-bottom:6px;
+}
+.form-group input{
+  width:100%;
+  padding:11px 14px;
+  border:1.5px solid #dfe8dd;
+  border-radius:12px;
+  font-family:"Vazirmatn",sans-serif;
+  font-size:14px;
+  background:var(--green-50);
+  color:var(--text-dark);
+  outline:none;
+  transition:.15s;
+}
+.form-group input:focus{
+  border-color:var(--green-600);
+  background:#fff;
+}
+
+/* Skill rows (radio group) */
+.skill-group{
+  border:1.5px solid #dfe8dd;
+  border-radius:12px;
+  padding:10px 12px;
+  background:var(--green-50);
+}
+.skill-group .skill-title{
+  font-size:13px;
+  font-weight:600;
+  color:var(--green-800);
+  margin-bottom:8px;
+}
+.skill-options{
+  display:flex;
+  justify-content:space-between;
+  gap:6px;
+}
+.skill-options label{
+  flex:1;
+  text-align:center;
+  font-size:11.5px;
+  color:var(--green-700);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  cursor:pointer;
+}
+.skill-options input[type="radio"]{
+  width:18px;
+  height:18px;
+  accent-color:var(--green-700);
+  cursor:pointer;
+}
+
+.generate-btn{
+  margin-top:6px;
+}
+
+/* ============ Buttons ============ */
+.btn{
+  display:block;
+  width:100%;
+  padding:14px 16px;
+  border-radius:12px;
+  font-family:"Vazirmatn",sans-serif;
+  font-size:14.5px;
+  font-weight:700;
+  border:none;
+  cursor:pointer;
+  transition:.15s;
+  text-align:center;
+}
+.btn-primary{
+  background:var(--green-800);
+  color:#fff;
+}
+.btn-primary:hover{background:var(--green-900);}
+.btn-outline{
+  background:#fff;
+  color:var(--green-800);
+  border:1.5px solid var(--green-700);
+}
+.btn-outline:hover{background:var(--green-50);}
+
+/* ============ Preview ============ */
+.preview-wrapper{
+  overflow-x:auto;
+  border-radius:12px;
+  margin-bottom:16px;
+  background:#eef2ec;
+  padding:8px;
+}
+.cert-preview{
+  position:relative;
+  width:100%;
+  max-width:480px;
+  margin:0 auto;
+  aspect-ratio: var(--ar, 1.41);
+}
+.cert-preview img.bg{
+  width:100%;
+  display:block;
+  border-radius:4px;
+}
+.cert-field{
+  position:absolute;
+  font-family:"Cinzel", serif;
+  color:#274a33;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  letter-spacing:0.5px;
+  line-height:1;
+  direction:ltr;
+}
+.cert-check{
+  position:absolute;
+  color:#111;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.download-buttons{
+  display:flex;
+  gap:10px;
+}
+.download-buttons .btn{flex:1;}
+
+/* ============ Footer ============ */
+.app-footer{
+  text-align:center;
+  font-size:11.5px;
+  color:#8a988c;
+  padding-top:6px;
+}
+
+/* Responsive font scaling handled via JS (percent-based sizing) */
