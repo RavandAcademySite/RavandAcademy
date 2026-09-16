@@ -2,18 +2,39 @@
    RAVAND - App logic
    ========================================================= */
 
-let currentTemplate = null;   // آبجکت تمپلیت انتخاب‌شده از TEMPLATES
-let currentData = {};         // مقادیر واردشده توسط فاندر
+let currentTemplate = null;   // selected template object from TEMPLATES
+let currentData = {};         // values entered by the founder
 
-const templateGrid   = document.getElementById("templateGrid");
-const formSection     = document.getElementById("formSection");
-const certForm        = document.getElementById("certForm");
-const previewSection  = document.getElementById("previewSection");
-const certPreview     = document.getElementById("certPreview");
-const downloadPngBtn  = document.getElementById("downloadPngBtn");
-const downloadPdfBtn  = document.getElementById("downloadPdfBtn");
+const templateGrid    = document.getElementById("templateGrid");
+const formSection      = document.getElementById("formSection");
+const certForm         = document.getElementById("certForm");
+const previewSection   = document.getElementById("previewSection");
+const certPreview      = document.getElementById("certPreview");
+const downloadPngBtn   = document.getElementById("downloadPngBtn");
+const downloadPdfBtn   = document.getElementById("downloadPdfBtn");
 
-/* ---------- 1) رندر کارت‌های انتخاب قالب ---------- */
+const MIN_DATE = "2020-01-01";
+
+/* ---------- checkmark SVG (crisp at any size) ---------- */
+const CHECK_SVG = `
+<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <path d="M7 21 L16 30 L34 9" fill="none" stroke="#1f3d2b"
+        stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
+/* ---------- date helpers ---------- */
+function formatDateDisplay(isoStr){
+  if (!isoStr) return "";
+  const d = new Date(isoStr + "T00:00:00");
+  if (isNaN(d)) return isoStr;
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+function todayISO(){
+  return new Date().toISOString().slice(0,10);
+}
+
+/* ---------- 1) render template selection cards ---------- */
 function renderTemplateGrid(){
   templateGrid.innerHTML = "";
   Object.values(TEMPLATES).forEach(tpl => {
@@ -44,7 +65,7 @@ function selectTemplate(id){
   formSection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-/* ---------- 2) رندر فرم داینامیک بر اساس فیلدهای تمپلیت ---------- */
+/* ---------- 2) render the dynamic form ---------- */
 function renderForm(){
   certForm.innerHTML = "";
 
@@ -56,6 +77,11 @@ function renderForm(){
       wrap.innerHTML = `
         <label for="f_${field.key}">${field.label}</label>
         <input type="text" id="f_${field.key}" name="${field.key}" placeholder="${field.placeholder || ""}">
+      `;
+    } else if (field.type === "date") {
+      wrap.innerHTML = `
+        <label for="f_${field.key}">${field.label}</label>
+        <input type="date" id="f_${field.key}" name="${field.key}" min="${MIN_DATE}" value="${todayISO()}">
       `;
     } else if (field.type === "skill") {
       wrap.innerHTML = `
@@ -84,12 +110,12 @@ function renderForm(){
   const submitBtn = document.createElement("button");
   submitBtn.type = "button";
   submitBtn.className = "btn btn-primary generate-btn";
-  submitBtn.textContent = "ثبت و نمایش کارنامه";
+  submitBtn.textContent = "Generate Report Card";
   submitBtn.addEventListener("click", handleGenerate);
   certForm.appendChild(submitBtn);
 }
 
-/* ---------- 3) جمع‌آوری دیتا و ساخت پیش‌نمایش ---------- */
+/* ---------- 3) collect data & build preview ---------- */
 function handleGenerate(){
   currentData = {};
 
@@ -97,6 +123,10 @@ function handleGenerate(){
     if (field.type === "text") {
       const input = document.getElementById(`f_${field.key}`);
       currentData[field.key] = (input.value || field.placeholder || "").trim();
+    } else if (field.type === "date") {
+      const input = document.getElementById(`f_${field.key}`);
+      currentData[field.key] = input.value || todayISO();
+      currentData[field.key + "_display"] = formatDateDisplay(currentData[field.key]);
     } else if (field.type === "skill") {
       const checked = certForm.querySelector(`input[name="${field.key}"]:checked`);
       currentData[field.key] = checked ? checked.value : null;
@@ -108,33 +138,30 @@ function handleGenerate(){
   previewSection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-/* ---------- 4) ساخت پیش‌نمایش روی تصویر ---------- */
-function renderPreview(){
-  const tpl = currentTemplate;
-  certPreview.style.setProperty("--ar", tpl.fullWidth / tpl.fullHeight);
-  certPreview.innerHTML = `<img class="bg" src="${tpl.bg}" alt="cert">`;
-
-  const pct = (val, full) => (val / full) * 100;
+/* ---------- 4) build the on-screen (responsive) preview ---------- */
+function buildCertLayer(container, tpl, scale){
+  // scale = px multiplier from native template px -> container px (1 = full native res)
+  container.innerHTML = `<img class="bg" src="${tpl.bg}" alt="cert">`;
 
   tpl.fields.forEach(field => {
-    if (field.type === "text") {
-      const value = currentData[field.key];
+    if (field.type === "text" || field.type === "date") {
+      const value = field.type === "date"
+        ? currentData[field.key + "_display"]
+        : currentData[field.key];
       if (!value) return;
       const box = field.box;
       const div = document.createElement("div");
       div.className = "cert-field";
       div.dataset.fieldKey = field.key;
       div.textContent = value;
-      div.style.left   = pct(box.x, tpl.fullWidth) + "%";
-      div.style.top    = pct(box.y, tpl.fullHeight) + "%";
-      div.style.width  = pct(box.w, tpl.fullWidth) + "%";
-      div.style.height = pct(box.h, tpl.fullHeight) + "%";
-      div.style.fontSize = (field.fontSize / tpl.fullWidth * 100) + "cqw"; // fallback handled below
+      div.style.left   = (box.x * scale) + "px";
+      div.style.top    = (box.y * scale) + "px";
+      div.style.width  = (box.w * scale) + "px";
+      div.style.height = (box.h * scale) + "px";
+      div.style.fontSize = (field.fontSize * scale) + "px";
       div.style.fontWeight = field.weight || 600;
       div.style.justifyContent = field.align === "center" ? "center" : "flex-start";
-      // فونت را متناسب با درصد عرض تصویر تنظیم می‌کنیم (نسبت به baseline فول‌رزولوشن)
-      div.style.fontSize = (field.fontSize / tpl.fullWidth) * 100 + "vw";
-      certPreview.appendChild(div);
+      container.appendChild(div);
     }
 
     if (field.type === "skill") {
@@ -145,79 +172,122 @@ function renderPreview(){
       const row = field.row;
       const div = document.createElement("div");
       div.className = "cert-check";
-      div.textContent = "✔";
-      div.style.left   = pct(col.x, tpl.fullWidth) + "%";
-      div.style.top    = pct(row.y, tpl.fullHeight) + "%";
-      div.style.width  = pct(col.w, tpl.fullWidth) + "%";
-      div.style.height = pct(row.h, tpl.fullHeight) + "%";
-      div.style.fontSize = (row.h / tpl.fullHeight) * 60 + "vw" ;
-      div.style.fontSize = (34 / tpl.fullWidth) * 100 + "vw";
-      certPreview.appendChild(div);
+      div.innerHTML = CHECK_SVG;
+      div.style.left   = (col.x * scale) + "px";
+      div.style.top    = (row.y * scale) + "px";
+      div.style.width  = (col.w * scale) + "px";
+      div.style.height = (row.h * scale) + "px";
+      container.appendChild(div);
     }
   });
-
-  // اصلاح سایز فونت بر اساس عرض واقعی کانتینر (به‌جای vw که به viewport وابسته است)
-  requestAnimationFrame(fixFontSizes);
 }
 
-function fixFontSizes(){
-  const containerWidth = certPreview.getBoundingClientRect().width;
+function renderPreview(){
   const tpl = currentTemplate;
-  const scale = containerWidth / tpl.fullWidth;
+  certPreview.style.setProperty("--ar", tpl.fullWidth / tpl.fullHeight);
+  certPreview.style.position = "relative";
 
-  certPreview.querySelectorAll(".cert-field").forEach(el => {
-    const field = tpl.fields.find(f => f.key === el.dataset.fieldKey);
-    if (field) el.style.fontSize = (field.fontSize * scale) + "px";
-  });
-  certPreview.querySelectorAll(".cert-check").forEach(el => {
-    el.style.fontSize = (34 * scale) + "px";
-  });
+  // render responsively based on the current rendered width of the container
+  const containerWidth = certPreview.getBoundingClientRect().width || 480;
+  const scale = containerWidth / tpl.fullWidth;
+  buildCertLayer(certPreview, tpl, scale);
 }
 
 window.addEventListener("resize", () => {
-  if (currentTemplate && certPreview.innerHTML) fixFontSizes();
+  if (currentTemplate && previewSection.style.display !== "none") renderPreview();
 });
 
-/* ---------- 5) دانلود PNG / PDF ---------- */
-async function exportCanvas(){
-  return await html2canvas(certPreview, {
-    scale: 3,          // کیفیت بالا برای پرینت
+/* ---------- 5) high-resolution export ----------
+   Instead of screenshotting the small responsive preview (which caps
+   quality at the on-screen pixel size), we build an off-screen clone at
+   the template's FULL native resolution and capture that with html2canvas
+   at an extra supersampling factor for crisp PNG/PDF output. */
+async function buildHiResCanvas(){
+  const tpl = currentTemplate;
+
+  const hidden = document.createElement("div");
+  hidden.style.position = "fixed";
+  hidden.style.left = "-99999px";
+  hidden.style.top = "0";
+  hidden.style.width = tpl.fullWidth + "px";
+  hidden.style.height = tpl.fullHeight + "px";
+  hidden.style.overflow = "hidden";
+  document.body.appendChild(hidden);
+
+  buildCertLayer(hidden, tpl, 1); // scale 1 = native px, matches PSD coordinates exactly
+
+  // wait for the background image to fully load before capturing
+  const bgImg = hidden.querySelector("img.bg");
+  if (bgImg && !bgImg.complete) {
+    await new Promise(resolve => { bgImg.onload = resolve; bgImg.onerror = resolve; });
+  }
+
+  const canvas = await html2canvas(hidden, {
+    width: tpl.fullWidth,
+    height: tpl.fullHeight,
+    scale: 2,          // supersampling on top of native resolution = extra crisp output
     useCORS: true,
-    backgroundColor: null,
+    backgroundColor: "#ffffff",
   });
+
+  document.body.removeChild(hidden);
+  return canvas;
+}
+
+function fileDateStamp(){
+  // prefer the certificate's own date field if present, otherwise today
+  const dateField = currentTemplate.fields.find(f => f.type === "date");
+  const iso = dateField ? currentData[dateField.key] : null;
+  return iso || todayISO();
+}
+
+function fileBaseName(){
+  const name = (currentData.studentName || "student").replace(/\s+/g, "_");
+  return `${name}_${fileDateStamp()}`;
 }
 
 downloadPngBtn.addEventListener("click", async () => {
-  downloadPngBtn.textContent = "در حال آماده‌سازی...";
+  downloadPngBtn.disabled = true;
+  downloadPngBtn.textContent = "Preparing...";
   try {
-    const canvas = await exportCanvas();
+    const canvas = await buildHiResCanvas();
     const link = document.createElement("a");
-    link.download = `certificate_${(currentData.studentName || "student").replace(/\s+/g,"_")}.png`;
+    link.download = `${fileBaseName()}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   } finally {
-    downloadPngBtn.textContent = "دانلود PNG";
+    downloadPngBtn.disabled = false;
+    downloadPngBtn.textContent = "Download PNG";
   }
 });
 
 downloadPdfBtn.addEventListener("click", async () => {
-  downloadPdfBtn.textContent = "در حال آماده‌سازی...";
+  downloadPdfBtn.disabled = true;
+  downloadPdfBtn.textContent = "Preparing...";
   try {
-    const canvas = await exportCanvas();
+    const canvas = await buildHiResCanvas();
     const imgData = canvas.toDataURL("image/png");
+
+    const margin = Math.round(canvas.width * 0.015); // small margin on all 4 sides
+    const pageW = canvas.width + margin * 2;
+    const pageH = canvas.height + margin * 2;
+
     const { jsPDF } = window.jspdf;
-    const orientation = canvas.width >= canvas.height ? "landscape" : "portrait";
+    const orientation = pageW >= pageH ? "landscape" : "portrait";
     const pdf = new jsPDF({
       orientation,
       unit: "px",
-      format: [canvas.width, canvas.height],
+      format: [pageW, pageH],
     });
-    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-    pdf.save(`certificate_${(currentData.studentName || "student").replace(/\s+/g,"_")}.pdf`);
+    pdf.setFillColor(255, 255, 255);
+    pdf.rect(0, 0, pageW, pageH, "F");
+    pdf.addImage(imgData, "PNG", margin, margin, canvas.width, canvas.height);
+    pdf.save(`${fileBaseName()}.pdf`);
   } finally {
-    downloadPdfBtn.textContent = "دانلود PDF";
+    downloadPdfBtn.disabled = false;
+    downloadPdfBtn.textContent = "Download PDF";
   }
 });
 
-/* ---------- شروع ---------- */
+/* ---------- start ---------- */
 renderTemplateGrid();

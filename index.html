@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ravand Language Academy | ساخت کارنامه</title>
+<title>Ravand Language Academy | Report Card Generator</title>
 <link rel="icon" href="assets/icons/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -18,37 +18,37 @@
     <img src="assets/icons/logo.png" alt="Ravand" class="logo">
     <div class="header-text">
       <h1>Ravand Language Academy</h1>
-      <span>سامانه ساخت کارنامه دانش‌آموزان</span>
+      <span>Report Card Generator</span>
     </div>
   </header>
 
-  <!-- Step 1: انتخاب قالب -->
+  <!-- Step 1: template selection -->
   <section class="card">
     <div class="card-title">
       <span class="icon">🎨</span>
-      <h2>انتخاب قالب کارنامه</h2>
+      <h2>Choose a Template</h2>
     </div>
-    <p class="card-sub">یکی از قالب‌های زیر را انتخاب کنید.</p>
+    <p class="card-sub">Select one of the templates below.</p>
 
     <div class="template-grid" id="templateGrid">
-      <!-- با جاوااسکریپت پر می‌شود -->
+      <!-- filled by JS -->
     </div>
   </section>
 
-  <!-- Step 2: فرم اطلاعات (داینامیک بر اساس قالب انتخاب‌شده) -->
+  <!-- Step 2: dynamic form based on selected template -->
   <section class="card" id="formSection" style="display:none;">
     <div class="card-title">
       <span class="icon">📝</span>
-      <h2>اطلاعات کارنامه</h2>
+      <h2>Student Information</h2>
     </div>
     <form id="certForm" class="cert-form"></form>
   </section>
 
-  <!-- Step 3: پیش‌نمایش -->
+  <!-- Step 3: preview -->
   <section class="card" id="previewSection" style="display:none;">
     <div class="card-title">
       <span class="icon">👁️</span>
-      <h2>پیش‌نمایش کارنامه</h2>
+      <h2>Preview</h2>
     </div>
 
     <div class="preview-wrapper">
@@ -56,8 +56,8 @@
     </div>
 
     <div class="download-buttons">
-      <button id="downloadPngBtn" class="btn btn-outline">دانلود PNG</button>
-      <button id="downloadPdfBtn" class="btn btn-primary">دانلود PDF</button>
+      <button id="downloadPngBtn" class="btn btn-outline">Download PNG</button>
+      <button id="downloadPdfBtn" class="btn btn-primary">Download PDF</button>
     </div>
   </section>
 
@@ -66,7 +66,7 @@
   </footer>
 </div>
 
-<!-- کتابخانه‌های خروجی گرفتن از تصویر -->
+<!-- Export libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
