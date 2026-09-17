@@ -15,11 +15,11 @@ const downloadPdfBtn   = document.getElementById("downloadPdfBtn");
 
 const MIN_DATE = "2020-01-01";
 
-/* ---------- checkmark SVG (crisp at any size) ---------- */
+/* ---------- checkmark SVG (crisp at any size, fills the printed circle) ---------- */
 const CHECK_SVG = `
 <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-  <path d="M7 21 L16 30 L34 9" fill="none" stroke="#1f3d2b"
-        stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M5 20 L15.5 30.5 L35 7" fill="none" stroke="#1f3d2b"
+        stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
 /* ---------- date helpers ---------- */
@@ -109,10 +109,40 @@ function renderForm(){
 
   const submitBtn = document.createElement("button");
   submitBtn.type = "button";
+  submitBtn.id = "generateBtn";
   submitBtn.className = "btn btn-primary generate-btn";
-  submitBtn.textContent = "Generate Report Card";
+  submitBtn.textContent = "Generate Certificate";
+  submitBtn.disabled = true;
   submitBtn.addEventListener("click", handleGenerate);
   certForm.appendChild(submitBtn);
+
+  // re-validate on every keystroke / selection change
+  certForm.addEventListener("input", validateForm);
+  certForm.addEventListener("change", validateForm);
+  validateForm();
+}
+
+/* ---------- validation: every field must be filled before Generate works ---------- */
+function validateForm(){
+  const submitBtn = document.getElementById("generateBtn");
+  if (!submitBtn) return;
+
+  const allFilled = currentTemplate.fields.every(field => {
+    if (field.type === "text") {
+      const input = document.getElementById(`f_${field.key}`);
+      return input && input.value.trim().length > 0;
+    }
+    if (field.type === "date") {
+      const input = document.getElementById(`f_${field.key}`);
+      return input && input.value.length > 0;
+    }
+    if (field.type === "skill") {
+      return !!certForm.querySelector(`input[name="${field.key}"]:checked`);
+    }
+    return true;
+  });
+
+  submitBtn.disabled = !allFilled;
 }
 
 /* ---------- 3) collect data & build preview ---------- */
@@ -122,7 +152,7 @@ function handleGenerate(){
   currentTemplate.fields.forEach(field => {
     if (field.type === "text") {
       const input = document.getElementById(`f_${field.key}`);
-      currentData[field.key] = (input.value || field.placeholder || "").trim();
+      currentData[field.key] = input.value.trim();
     } else if (field.type === "date") {
       const input = document.getElementById(`f_${field.key}`);
       currentData[field.key] = input.value || todayISO();
@@ -162,6 +192,7 @@ function buildCertLayer(container, tpl, scale){
       div.style.fontWeight = field.weight || 600;
       div.style.justifyContent = field.align === "center" ? "center" : "flex-start";
       container.appendChild(div);
+      fitTextToBox(div, box.w * scale); // shrink long names/values so they never spill outside their box
     }
 
     if (field.type === "skill") {
@@ -180,6 +211,19 @@ function buildCertLayer(container, tpl, scale){
       container.appendChild(div);
     }
   });
+}
+
+/* shrink font-size step by step until the text fits inside its own box width
+   (protects long teacher/student names from overflowing their printed line) */
+function fitTextToBox(div, maxWidthPx){
+  const minFontPx = 8;
+  let guard = 60; // safety limit on iterations
+  let fontPx = parseFloat(div.style.fontSize);
+  div.style.whiteSpace = "nowrap";
+  while (div.scrollWidth > maxWidthPx && fontPx > minFontPx && guard-- > 0) {
+    fontPx -= 1;
+    div.style.fontSize = fontPx + "px";
+  }
 }
 
 function renderPreview(){

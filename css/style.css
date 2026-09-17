@@ -39,10 +39,16 @@ body{
 .app-header{
   display:flex;
   align-items:center;
+  gap:12px;
   padding:8px 4px 20px;
 }
+.app-header .logo{
+  width:48px;
+  height:auto;
+  flex-shrink:0;
+}
 .header-text h1{
-  font-size:19px;
+  font-size:18px;
   margin:0;
   color:var(--green-900);
   font-weight:800;
@@ -158,6 +164,25 @@ body{
 .form-group input[type="date"]{
   font-family:"Poppins",sans-serif;
   color:var(--text-dark);
+  position:relative;
+  cursor:pointer;
+}
+/* Chrome / Edge / Safari (WebKit) - recolor the native calendar icon to brand green
+   and give it some breathing room so the field feels intentional, not just a raw
+   OS widget dropped on the page. */
+.form-group input[type="date"]::-webkit-calendar-picker-indicator{
+  filter: invert(0.35) sepia(1) saturate(4) hue-rotate(100deg) brightness(0.75);
+  cursor:pointer;
+  padding:4px;
+  margin-right:-4px;
+  border-radius:6px;
+  transition:.15s;
+}
+.form-group input[type="date"]::-webkit-calendar-picker-indicator:hover{
+  background:var(--green-100);
+}
+.form-group input[type="date"]::-webkit-datetime-edit{
+  padding:2px 0;
 }
 
 /* Skill rows (radio group) */
@@ -214,6 +239,12 @@ body{
   transition:.15s;
   text-align:center;
 }
+.btn:disabled{
+  background:#c7d3c8 !important;
+  color:#8a988c !important;
+  border-color:#c7d3c8 !important;
+  cursor:not-allowed;
+}
 .btn-primary{
   background:var(--green-800);
   color:#fff;
@@ -268,8 +299,8 @@ body{
   justify-content:center;
 }
 .cert-check svg{
-  width:62%;
-  height:62%;
+  width:80%;
+  height:80%;
 }
 
 .download-buttons{
@@ -287,3 +318,21 @@ body{
 }
 
 /* Responsive font scaling handled via JS (percent-based sizing) */
+
+/* ============ Prevent accidental text-selection / I-beam cursor ============
+   All static UI copy (headings, labels, captions, buttons, template names,
+   footer) should behave like part of the interface, not selectable body
+   text. Real inputs are explicitly excluded so typing still works normally. */
+h1, h2, h3, label, p, span, button, .tname, .skill-title, .app-footer,
+.card-title, .card-sub{
+  user-select:none;
+  -webkit-user-select:none;
+  cursor:default;
+}
+.skill-options label{ cursor:pointer; } /* radio labels stay clickable-looking */
+.template-option .tname{ cursor:pointer; } /* keep pointer consistent over the whole clickable card */
+input, textarea{
+  user-select:text;
+  -webkit-user-select:text;
+  cursor:text;
+}
