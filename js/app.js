@@ -225,7 +225,9 @@ async function buildHiResCanvas(){
   const canvas = await html2canvas(hidden, {
     width: tpl.fullWidth,
     height: tpl.fullHeight,
-    scale: 2,          // supersampling on top of native resolution = extra crisp output
+    scale: 1,          // background is already native full-resolution artwork;
+                        // no extra supersampling needed (this alone was the main
+                        // cause of the huge 26MB PDF files)
     useCORS: true,
     backgroundColor: "#ffffff",
   });
@@ -266,7 +268,10 @@ downloadPdfBtn.addEventListener("click", async () => {
   downloadPdfBtn.textContent = "Preparing...";
   try {
     const canvas = await buildHiResCanvas();
-    const imgData = canvas.toDataURL("image/png");
+    // JPEG instead of PNG for the embedded image: visually identical for this
+    // kind of artwork/photo-like background, but a fraction of the file size.
+    // (PNG here was the reason the PDF used to come out ~26MB.)
+    const imgData = canvas.toDataURL("image/jpeg", 0.92);
 
     const margin = Math.round(canvas.width * 0.015); // small margin on all 4 sides
     const pageW = canvas.width + margin * 2;
@@ -278,10 +283,11 @@ downloadPdfBtn.addEventListener("click", async () => {
       orientation,
       unit: "px",
       format: [pageW, pageH],
+      compress: true,
     });
     pdf.setFillColor(255, 255, 255);
     pdf.rect(0, 0, pageW, pageH, "F");
-    pdf.addImage(imgData, "PNG", margin, margin, canvas.width, canvas.height);
+    pdf.addImage(imgData, "JPEG", margin, margin, canvas.width, canvas.height);
     pdf.save(`${fileBaseName()}.pdf`);
   } finally {
     downloadPdfBtn.disabled = false;

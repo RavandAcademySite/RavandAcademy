@@ -10,8 +10,8 @@ const TEMPLATES = {
   kids: {
     id: "kids",
     title: "Kids",
-    thumb: "assets/templates/kids-bg.jpg",
-    bg: "assets/templates/kids-bg.jpg",
+    thumb: "assets/templates/kids-thumb.jpg",
+    bg: "assets/templates/kids-bg.png",
     fullWidth: 2984,
     fullHeight: 2108,
     fields: [
@@ -62,8 +62,8 @@ const TEMPLATES = {
   adults: {
     id: "adults",
     title: "Adults",
-    thumb: "assets/templates/adults-bg.jpg",
-    bg: "assets/templates/adults-bg.jpg",
+    thumb: "assets/templates/adults-thumb.jpg",
+    bg: "assets/templates/adults-bg.png",
     fullWidth: 1492,
     fullHeight: 1054,
     fields: [
