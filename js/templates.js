@@ -31,31 +31,39 @@ const TEMPLATES = {
         box: { x: 2377, y: 867, w: 150, h: 86 }, align: "center", fontSize: 74, weight: 800 },
 
       { key: "book", label: "Book", type: "text", placeholder: "e.g. Evolve 2",
-        box: { x: 768, y: 992, w: 317, h: 60 }, align: "center", fontSize: 58, weight: 700 },
+        box: { x: 768, y: 992, w: 600, h: 60 }, align: "center", fontSize: 58, weight: 700 },
 
       { key: "term", label: "Term", type: "text", placeholder: "e.g. Term 2 A",
         box: { x: 2023, y: 964, w: 326, h: 92 }, align: "center", fontSize: 78, weight: 700 },
 
       { key: "date", label: "Exam Date", type: "date",
-        box: { x: 1700, y: 1900, w: 340, h: 34 }, align: "center", fontSize: 26, weight: 600 },
+        // this box is the ACTUAL date line on the certificate (above the
+        // static "DATE" caption); it was previously (wrongly) pointed at the
+        // caption's own position, which is why two different dates used to
+        // show up stacked on top of each other.
+        box: { x: 1642, y: 1826, w: 260, h: 40 }, align: "center", fontSize: 34, weight: 600 },
 
       // Skill rows -> for each one the user picks OK / GOOD / EXCELLENT
+      // (row centers measured directly from the printed circles on the
+      // artwork, not guessed - so the checkmark lands dead-center every time)
       { key: "skill_activity", label: "Class Activity", type: "skill",
-        row: { y: 1250, h: 55 } },
+        row: { y: 1259, h: 58 } },
       { key: "skill_homework", label: "Homework", type: "skill",
-        row: { y: 1332, h: 55 } },
+        row: { y: 1342, h: 58 } },
       { key: "skill_speaking", label: "Speaking", type: "skill",
-        row: { y: 1424, h: 55 } },
+        row: { y: 1430, h: 58 } },
       { key: "skill_listening", label: "Listening", type: "skill",
-        row: { y: 1503, h: 55 } },
+        row: { y: 1511, h: 58 } },
       { key: "skill_writing", label: "Writing", type: "skill",
-        row: { y: 1584, h: 55 } },
+        row: { y: 1592, h: 58 } },
     ],
-    // Column x-positions for OK / GOOD / EXCELLENT (used by skill fields)
+    // Column x-positions for OK / GOOD / EXCELLENT (measured from the actual
+    // printed circles so the checkmark fills the ring instead of floating
+    // near it)
     skillColumns: {
-      ok: { x: 1471, w: 62 },
-      good: { x: 1836, w: 62 },
-      excellent: { x: 2221, w: 62 },
+      ok: { x: 1467, w: 60 },
+      good: { x: 1832, w: 60 },
+      excellent: { x: 2216, w: 60 },
     },
   },
 
