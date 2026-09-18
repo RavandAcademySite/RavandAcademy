@@ -47,23 +47,23 @@ const TEMPLATES = {
       // (row centers measured directly from the printed circles on the
       // artwork, not guessed - so the checkmark lands dead-center every time)
       { key: "skill_activity", label: "Class Activity", type: "skill",
-        row: { y: 1259, h: 58 } },
+        row: { y: 1264, h: 58 } },
       { key: "skill_homework", label: "Homework", type: "skill",
-        row: { y: 1342, h: 58 } },
+        row: { y: 1347, h: 58 } },
       { key: "skill_speaking", label: "Speaking", type: "skill",
-        row: { y: 1430, h: 58 } },
+        row: { y: 1435, h: 58 } },
       { key: "skill_listening", label: "Listening", type: "skill",
-        row: { y: 1511, h: 58 } },
+        row: { y: 1516, h: 58 } },
       { key: "skill_writing", label: "Writing", type: "skill",
-        row: { y: 1592, h: 58 } },
+        row: { y: 1597, h: 58 } },
     ],
-    // Column x-positions for OK / GOOD / EXCELLENT (measured from the actual
-    // printed circles so the checkmark fills the ring instead of floating
-    // near it)
+    // Column x-positions for OK / GOOD / EXCELLENT (re-measured pixel-by-pixel
+    // against the printed rings - previous values sat the dot ~13px right of
+    // true ring center, leaving a gold sliver visible on the left edge)
     skillColumns: {
-      ok: { x: 1467, w: 60 },
-      good: { x: 1832, w: 60 },
-      excellent: { x: 2216, w: 60 },
+      ok: { x: 1454, w: 60 },
+      good: { x: 1819, w: 60 },
+      excellent: { x: 2203, w: 60 },
     },
   },
 
