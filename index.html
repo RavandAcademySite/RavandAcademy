@@ -19,6 +19,10 @@
     <div class="header-text">
       <h1>Ravand Academy Certificate Generator</h1>
     </div>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">
+      <span class="theme-icon theme-icon-sun">☀️</span>
+      <span class="theme-icon theme-icon-moon">🌙</span>
+    </button>
   </header>
 
   <!-- Step 1: template selection -->
@@ -36,7 +40,6 @@
   <!-- Step 2: dynamic form based on selected template -->
   <section class="card" id="formSection" style="display:none;">
     <div class="card-title">
-      <span class="icon">📝</span>
       <h2>Student Information</h2>
     </div>
     <form id="certForm" class="cert-form"></form>
@@ -45,7 +48,6 @@
   <!-- Step 3: preview -->
   <section class="card" id="previewSection" style="display:none;">
     <div class="card-title">
-      <span class="icon">👁️</span>
       <h2>Preview</h2>
     </div>
 
@@ -59,6 +61,34 @@
     </div>
   </section>
 
+  <!-- Bulk generation from Excel -->
+  <section class="card" id="bulkSection">
+    <div class="card-title">
+      <h2>Bulk Generate from Excel</h2>
+    </div>
+    <p class="card-sub">Generate many certificates at once from a spreadsheet — one row per student.</p>
+
+    <div class="form-group">
+      <label for="bulkTemplateSelect">Template</label>
+      <select id="bulkTemplateSelect"></select>
+    </div>
+
+    <button id="bulkDownloadSampleBtn" class="btn btn-outline" type="button">
+      Download Excel Template
+    </button>
+
+    <div class="form-group" style="margin-top:14px;">
+      <label for="bulkFileInput">Upload filled spreadsheet (.xlsx)</label>
+      <input type="file" id="bulkFileInput" accept=".xlsx,.xls,.csv">
+    </div>
+
+    <button id="bulkGenerateBtn" class="btn btn-primary" type="button" disabled>
+      Generate All Certificates
+    </button>
+
+    <div id="bulkStatus" class="bulk-status"></div>
+  </section>
+
   <footer class="app-footer">
     <span>© Ravand Language Academy</span>
   </footer>
@@ -67,8 +97,14 @@
 <!-- Export libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Bulk-generation libraries: SheetJS reads/writes Excel files, JSZip bundles
+     many PNGs into one downloadable .zip -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <script src="js/templates.js"></script>
 <script src="js/app.js"></script>
+<script src="js/bulk.js"></script>
+<script src="js/theme.js"></script>
 </body>
 </html>

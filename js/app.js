@@ -15,12 +15,8 @@ const downloadPdfBtn   = document.getElementById("downloadPdfBtn");
 
 const MIN_DATE = "2020-01-01";
 
-/* ---------- checkmark SVG (crisp at any size, fills the printed circle) ---------- */
-const CHECK_SVG = `
-<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-  <path d="M5 20 L15.5 30.5 L35 7" fill="none" stroke="#1f3d2b"
-        stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`;
+/* ---------- "selected" indicator for skill rows: a filled dark circle
+   (no checkmark shape) that sits inside the printed ring ---------- */
 
 /* ---------- date helpers ---------- */
 function formatDateDisplay(isoStr){
@@ -146,7 +142,7 @@ function validateForm(){
 }
 
 /* ---------- 3) collect data & build preview ---------- */
-function handleGenerate(){
+async function handleGenerate(){
   currentData = {};
 
   currentTemplate.fields.forEach(field => {
@@ -163,21 +159,29 @@ function handleGenerate(){
     }
   });
 
-  renderPreview();
+  const btn = document.getElementById("generateBtn");
+  if (btn) { btn.disabled = true; btn.textContent = "Generating..."; }
+
+  await renderPreview();
   previewSection.style.display = "block";
   previewSection.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  if (btn) { btn.disabled = false; btn.textContent = "Generate Certificate"; }
 }
 
-/* ---------- 4) build the on-screen (responsive) preview ---------- */
-function buildCertLayer(container, tpl, scale){
+/* ---------- build one certificate's DOM layer at any scale ----------
+   `data` is passed explicitly (not read from a shared global) so this
+   same function can be reused for one-off certificates AND for bulk
+   generation from Excel without the two ever interfering with each other. */
+function buildCertLayer(container, tpl, scale, data){
   // scale = px multiplier from native template px -> container px (1 = full native res)
   container.innerHTML = `<img class="bg" src="${tpl.bg}" alt="cert">`;
 
   tpl.fields.forEach(field => {
     if (field.type === "text" || field.type === "date") {
       const value = field.type === "date"
-        ? currentData[field.key + "_display"]
-        : currentData[field.key];
+        ? data[field.key + "_display"]
+        : data[field.key];
       if (!value) return;
       const box = field.box;
       const div = document.createElement("div");
@@ -191,23 +195,26 @@ function buildCertLayer(container, tpl, scale){
       div.style.fontSize = (field.fontSize * scale) + "px";
       div.style.fontWeight = field.weight || 600;
       div.style.justifyContent = field.align === "center" ? "center" : "flex-start";
+      div.style.alignItems = field.valign === "bottom" ? "flex-end" : "center";
       container.appendChild(div);
       fitTextToBox(div, box.w * scale); // shrink long names/values so they never spill outside their box
     }
 
     if (field.type === "skill") {
-      const value = currentData[field.key];
+      const value = data[field.key];
       if (!value) return;
       const col = tpl.skillColumns[value];
       if (!col) return;
       const row = field.row;
       const div = document.createElement("div");
       div.className = "cert-check";
-      div.innerHTML = CHECK_SVG;
       div.style.left   = (col.x * scale) + "px";
       div.style.top    = (row.y * scale) + "px";
       div.style.width  = (col.w * scale) + "px";
       div.style.height = (row.h * scale) + "px";
+      const dot = document.createElement("div");
+      dot.className = "cert-check-dot";
+      div.appendChild(dot);
       container.appendChild(div);
     }
   });
@@ -226,29 +233,39 @@ function fitTextToBox(div, maxWidthPx){
   }
 }
 
-function renderPreview(){
+/* ---------- 4) preview = the exact same image that gets downloaded ----------
+   Previously the on-screen preview was built with a separate, smaller,
+   percentage-scaled DOM render, while the actual PNG/PDF was generated
+   from a completely different native-resolution render. Those two code
+   paths could drift apart (different font-fit results, rounding, etc.),
+   which is exactly why the preview and the real output didn't match.
+   Now there is only ONE render path: build it once at full resolution,
+   cache the resulting canvas, and just display that same canvas (scaled
+   down visually via CSS) in the preview. Downloads reuse the same canvas
+   instead of re-rendering - guaranteed pixel-identical, and faster too. */
+let lastCanvas = null;
+
+async function renderPreview(){
   const tpl = currentTemplate;
   certPreview.style.setProperty("--ar", tpl.fullWidth / tpl.fullHeight);
-  certPreview.style.position = "relative";
+  certPreview.innerHTML = `<div class="preview-loading">Rendering certificate…</div>`;
 
-  // render responsively based on the current rendered width of the container
-  const containerWidth = certPreview.getBoundingClientRect().width || 480;
-  const scale = containerWidth / tpl.fullWidth;
-  buildCertLayer(certPreview, tpl, scale);
+  lastCanvas = await buildHiResCanvas(tpl, currentData);
+
+  certPreview.innerHTML = "";
+  lastCanvas.style.width = "100%";
+  lastCanvas.style.height = "auto";
+  lastCanvas.style.display = "block";
+  lastCanvas.style.borderRadius = "4px";
+  certPreview.appendChild(lastCanvas);
 }
-
-window.addEventListener("resize", () => {
-  if (currentTemplate && previewSection.style.display !== "none") renderPreview();
-});
 
 /* ---------- 5) high-resolution export ----------
    Instead of screenshotting the small responsive preview (which caps
    quality at the on-screen pixel size), we build an off-screen clone at
    the template's FULL native resolution and capture that with html2canvas
    at an extra supersampling factor for crisp PNG/PDF output. */
-async function buildHiResCanvas(){
-  const tpl = currentTemplate;
-
+async function buildHiResCanvas(tpl, data){
   const hidden = document.createElement("div");
   hidden.style.position = "fixed";
   hidden.style.left = "-99999px";
@@ -258,7 +275,7 @@ async function buildHiResCanvas(){
   hidden.style.overflow = "hidden";
   document.body.appendChild(hidden);
 
-  buildCertLayer(hidden, tpl, 1); // scale 1 = native px, matches PSD coordinates exactly
+  buildCertLayer(hidden, tpl, 1, data); // scale 1 = native px, matches PSD coordinates exactly
 
   // wait for the background image to fully load before capturing
   const bgImg = hidden.querySelector("img.bg");
@@ -296,7 +313,7 @@ downloadPngBtn.addEventListener("click", async () => {
   downloadPngBtn.disabled = true;
   downloadPngBtn.textContent = "Preparing...";
   try {
-    const canvas = await buildHiResCanvas();
+    const canvas = lastCanvas || await buildHiResCanvas(currentTemplate, currentData);
     const link = document.createElement("a");
     link.download = `${fileBaseName()}.png`;
     link.href = canvas.toDataURL("image/png");
@@ -311,7 +328,7 @@ downloadPdfBtn.addEventListener("click", async () => {
   downloadPdfBtn.disabled = true;
   downloadPdfBtn.textContent = "Preparing...";
   try {
-    const canvas = await buildHiResCanvas();
+    const canvas = lastCanvas || await buildHiResCanvas(currentTemplate, currentData);
     // JPEG instead of PNG for the embedded image: visually identical for this
     // kind of artwork/photo-like background, but a fraction of the file size.
     // (PNG here was the reason the PDF used to come out ~26MB.)

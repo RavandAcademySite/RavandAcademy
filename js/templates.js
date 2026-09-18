@@ -22,19 +22,19 @@ const TEMPLATES = {
         box: { x: 1268, y: 772, w: 699, h: 70 }, align: "center", fontSize: 64, weight: 700 },
 
       { key: "oral", label: "Oral Score", type: "text", placeholder: "e.g. 95",
-        box: { x: 730, y: 867, w: 150, h: 86 }, align: "center", fontSize: 74, weight: 800 },
+        box: { x: 730, y: 865, w: 150, h: 80 }, align: "center", valign: "bottom", fontSize: 70, weight: 800 },
 
       { key: "test", label: "Test Score", type: "text", placeholder: "e.g. 90",
-        box: { x: 1491, y: 867, w: 150, h: 86 }, align: "center", fontSize: 74, weight: 800 },
+        box: { x: 1491, y: 865, w: 150, h: 80 }, align: "center", valign: "bottom", fontSize: 70, weight: 800 },
 
       { key: "overall", label: "Overall Score", type: "text", placeholder: "e.g. 92",
-        box: { x: 2377, y: 867, w: 150, h: 86 }, align: "center", fontSize: 74, weight: 800 },
+        box: { x: 2377, y: 865, w: 150, h: 80 }, align: "center", valign: "bottom", fontSize: 70, weight: 800 },
 
       { key: "book", label: "Book", type: "text", placeholder: "e.g. Evolve 2",
-        box: { x: 768, y: 992, w: 600, h: 60 }, align: "center", fontSize: 58, weight: 700 },
+        box: { x: 768, y: 988, w: 600, h: 70 }, align: "center", valign: "bottom", fontSize: 62, weight: 700 },
 
       { key: "term", label: "Term", type: "text", placeholder: "e.g. Term 2 A",
-        box: { x: 2023, y: 964, w: 326, h: 92 }, align: "center", fontSize: 78, weight: 700 },
+        box: { x: 2023, y: 988, w: 326, h: 70 }, align: "center", valign: "bottom", fontSize: 62, weight: 700 },
 
       { key: "date", label: "Exam Date", type: "date",
         // this box is the ACTUAL date line on the certificate (above the
