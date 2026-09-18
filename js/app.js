@@ -15,18 +15,8 @@ const downloadPdfBtn   = document.getElementById("downloadPdfBtn");
 
 const MIN_DATE = "2020-01-01";
 
-/* ---------- "selected" indicator for skill rows ----------
-   A thin dark checkmark that sits inside the printed ring, matching the
-   look of the original certificate artwork. Built as an inline SVG data-URI
-   (used as a plain <img>) rather than a CSS clip-path shape, because
-   html2canvas ignores clip-path and used to print this as a solid black
-   square instead of a checkmark. */
-const CHECKMARK_SVG = "data:image/svg+xml;utf8," + encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-     <path d="M22 54 L42 74 L80 26" fill="none" stroke="#111111"
-           stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
-   </svg>`
-);
+/* ---------- "selected" indicator for skill rows: a filled dark circle
+   (no checkmark shape) that sits inside the printed ring ---------- */
 
 /* ---------- date helpers ---------- */
 function formatDateDisplay(isoStr){
@@ -222,17 +212,15 @@ function buildCertLayer(container, tpl, scale, data){
       div.style.top    = (row.y * scale) + "px";
       div.style.width  = (col.w * scale) + "px";
       div.style.height = (row.h * scale) + "px";
-      // The checkmark is a real <img> (SVG data-URI), not a CSS clip-path
-      // shape: html2canvas does not honor clip-path, which is exactly why
-      // the mark used to print as a solid black square instead of a
-      // checkmark. Images, on the other hand, are just drawn onto the
-      // canvas as-is, so this renders identically on screen and in the
-      // exported PNG/PDF.
-      const dot = document.createElement("img");
-      dot.className = "cert-check-dot";
-      dot.src = CHECKMARK_SVG;
-      dot.alt = "";
-      div.appendChild(dot);
+      // Real SVG checkmark (not a CSS clip-path shape) - html2canvas, used for
+      // the PNG/PDF export, does not reliably support clip-path and was
+      // rendering it as a near-invisible sliver. An inline <svg><polygon>
+      // rasterizes correctly every time.
+      div.innerHTML =
+        '<svg viewBox="0 0 100 100" width="100%" height="100%" ' +
+        'preserveAspectRatio="xMidYMid meet">' +
+        '<polygon points="20,52 34,39 44,61 71,21 84,31 47,84" fill="#000000"/>' +
+        '</svg>';
       container.appendChild(div);
     }
   });
