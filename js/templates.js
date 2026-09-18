@@ -31,7 +31,7 @@ const TEMPLATES = {
         box: { x: 2377, y: 865, w: 150, h: 80 }, align: "center", valign: "bottom", fontSize: 70, weight: 800 },
 
       { key: "book", label: "Book", type: "text", placeholder: "e.g. Evolve 2",
-        box: { x: 768, y: 988, w: 600, h: 70 }, align: "center", valign: "bottom", fontSize: 62, weight: 700 },
+        box: { x: 692, y: 988, w: 600, h: 70 }, align: "center", valign: "bottom", fontSize: 62, weight: 700 },
 
       { key: "term", label: "Term", type: "text", placeholder: "e.g. Term 2 A",
         box: { x: 2023, y: 988, w: 326, h: 70 }, align: "center", valign: "bottom", fontSize: 62, weight: 700 },
