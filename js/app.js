@@ -217,9 +217,9 @@ function buildCertLayer(container, tpl, scale, data){
       // rendering it as a near-invisible sliver. An inline <svg><polygon>
       // rasterizes correctly every time.
       div.innerHTML =
-        '<svg viewBox="0 0 100 100" width="100%" height="100%" ' +
-        'preserveAspectRatio="xMidYMid meet">' +
-        '<polygon points="20,52 34,39 44,61 71,21 84,31 47,84" fill="#000000"/>' +
+        '<svg viewBox="0 0 100 100" width="150%" height="150%" ' +
+        'preserveAspectRatio="xMidYMid meet" style="overflow:visible;">' +
+        '<polygon points="13,52 31,37 43,63 76,15 92,27 46,92" fill="#000000"/>' +
         '</svg>';
       container.appendChild(div);
     }
