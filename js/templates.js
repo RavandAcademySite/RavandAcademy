@@ -82,13 +82,13 @@ const TEMPLATES = {
         box: { x: 380, y: 648, w: 731, h: 30 }, align: "center", fontSize: 24, weight: 600 },
 
       { key: "exam", label: "Exam Score", type: "text", placeholder: "e.g. 99/100",
-        box: { x: 471, y: 774, w: 100, h: 26 }, align: "center", fontSize: 23, weight: 700 },
+        box: { x: 471, y: 782, w: 100, h: 26 }, align: "center", fontSize: 23, weight: 700 },
 
       { key: "oral", label: "Oral Score", type: "text", placeholder: "e.g. 99/100",
-        box: { x: 698, y: 775, w: 100, h: 26 }, align: "center", fontSize: 23, weight: 700 },
+        box: { x: 698, y: 783, w: 100, h: 26 }, align: "center", fontSize: 23, weight: 700 },
 
       { key: "total", label: "Total Score", type: "text", placeholder: "e.g. 99/100",
-        box: { x: 922, y: 773, w: 100, h: 26 }, align: "center", fontSize: 23, weight: 700 },
+        box: { x: 922, y: 781, w: 100, h: 26 }, align: "center", fontSize: 23, weight: 700 },
 
       { key: "date", label: "Certificate Date", type: "date",
         box: { x: 1020, y: 880, w: 200, h: 26 }, align: "center", fontSize: 22, weight: 600 },

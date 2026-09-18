@@ -364,10 +364,10 @@ body{
   justify-content:center;
 }
 .cert-check-dot{
-  width:78%;
-  height:78%;
+  width:100%;
+  height:100%;
   border-radius:50%;
-  background:#1f3d2b; /* filled dark circle inside the printed ring - no checkmark */
+  background:#000000; /* filled black circle inside the printed ring - no checkmark */
 }
 
 .download-buttons{
