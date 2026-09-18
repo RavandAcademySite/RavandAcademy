@@ -206,20 +206,31 @@ function buildCertLayer(container, tpl, scale, data){
       const col = tpl.skillColumns[value];
       if (!col) return;
       const row = field.row;
+      // Enlarge the checkmark 1.5x by growing the box itself (equally on all
+      // sides) around its original center, rather than relying on flexbox to
+      // center an overflowing child - html2canvas (used for PNG/PDF export)
+      // does not reliably center overflowing flex children, which was
+      // pushing the checkmark up-left instead of staying centered in the ring.
+      const ENLARGE = 1.5;
+      const baseW = col.w * scale;
+      const baseH = row.h * scale;
+      const boxW = baseW * ENLARGE;
+      const boxH = baseH * ENLARGE;
       const div = document.createElement("div");
       div.className = "cert-check";
-      div.style.left   = (col.x * scale) + "px";
-      div.style.top    = (row.y * scale) + "px";
-      div.style.width  = (col.w * scale) + "px";
-      div.style.height = (row.h * scale) + "px";
+      div.style.left   = (col.x * scale - (boxW - baseW) / 2) + "px";
+      div.style.top    = (row.y * scale - (boxH - baseH) / 2) + "px";
+      div.style.width  = boxW + "px";
+      div.style.height = boxH + "px";
       // Real SVG checkmark (not a CSS clip-path shape) - html2canvas, used for
       // the PNG/PDF export, does not reliably support clip-path and was
       // rendering it as a near-invisible sliver. An inline <svg><polygon>
-      // rasterizes correctly every time.
+      // rasterizes correctly every time. Color matches the printed ink
+      // (--green-900) instead of black.
       div.innerHTML =
-        '<svg viewBox="0 0 100 100" width="150%" height="150%" ' +
-        'preserveAspectRatio="xMidYMid meet" style="overflow:visible;">' +
-        '<polygon points="13,52 31,37 43,63 76,15 92,27 46,92" fill="#000000"/>' +
+        '<svg viewBox="0 0 100 100" width="100%" height="100%" ' +
+        'preserveAspectRatio="xMidYMid meet">' +
+        '<polygon points="13,52 31,37 43,63 76,15 92,27 46,92" fill="#1f3d2b"/>' +
         '</svg>';
       container.appendChild(div);
     }
