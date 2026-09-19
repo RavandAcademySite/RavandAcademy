@@ -206,22 +206,20 @@ function buildCertLayer(container, tpl, scale, data){
       const col = tpl.skillColumns[value];
       if (!col) return;
       const row = field.row;
-      // Enlarge the checkmark 1.5x by growing the box itself (equally on all
-      // sides) around its original center, rather than relying on flexbox to
-      // center an overflowing child - html2canvas (used for PNG/PDF export)
-      // does not reliably center overflowing flex children, which was
-      // pushing the checkmark up-left instead of staying centered in the ring.
-      const ENLARGE = 1.5;
-      const baseW = col.w * scale;
-      const baseH = row.h * scale;
-      const boxW = baseW * ENLARGE;
-      const boxH = baseH * ENLARGE;
+      // NOTE: an earlier version enlarged this box 1.5x (symmetric growth
+      // around the same center) to make the checkmark bigger, but every real
+      // exported PNG showed it rendered bigger AND shifted up-left instead of
+      // staying centered - html2canvas evidently doesn't rasterize that
+      // symmetric-overflow box the way a live browser preview does. Sizing
+      // the box to exactly match the printed ring (no enlarge) is the
+      // version that was confirmed well-centered in an actual export, so
+      // that's what we use.
       const div = document.createElement("div");
       div.className = "cert-check";
-      div.style.left   = (col.x * scale - (boxW - baseW) / 2) + "px";
-      div.style.top    = (row.y * scale - (boxH - baseH) / 2) + "px";
-      div.style.width  = boxW + "px";
-      div.style.height = boxH + "px";
+      div.style.left   = (col.x * scale) + "px";
+      div.style.top    = (row.y * scale) + "px";
+      div.style.width  = (col.w * scale) + "px";
+      div.style.height = (row.h * scale) + "px";
       // Real SVG checkmark (not a CSS clip-path shape) - html2canvas, used for
       // the PNG/PDF export, does not reliably support clip-path and was
       // rendering it as a near-invisible sliver. An inline <svg><polygon>
