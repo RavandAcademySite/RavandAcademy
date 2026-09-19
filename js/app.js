@@ -214,6 +214,8 @@ function buildCertLayer(container, tpl, scale, data){
       // the box to exactly match the printed ring (no enlarge) is the
       // version that was confirmed well-centered in an actual export, so
       // that's what we use.
+      // Overflow above the ring is intentional here, so the SVG must not
+      // clip to its viewBox.
       const div = document.createElement("div");
       div.className = "cert-check";
       div.style.left   = (col.x * scale) + "px";
@@ -224,11 +226,14 @@ function buildCertLayer(container, tpl, scale, data){
       // the PNG/PDF export, does not reliably support clip-path and was
       // rendering it as a near-invisible sliver. An inline <svg><polygon>
       // rasterizes correctly every time. Color matches the printed ink
-      // (--green-900) instead of black.
+      // (--green-900) instead of black. The shape is drawn so its bottom tip
+      // sits on the ring's center and the top-right arm pokes slightly
+      // outside the ring, like a hand-drawn checkmark rather than a shape
+      // squeezed to fit inside the circle.
       div.innerHTML =
         '<svg viewBox="0 0 100 100" width="100%" height="100%" ' +
-        'preserveAspectRatio="xMidYMid meet">' +
-        '<polygon points="13,52 31,37 43,63 76,15 92,27 46,92" fill="#1f3d2b"/>' +
+        'preserveAspectRatio="xMidYMid meet" style="overflow:visible;">' +
+        '<polygon points="17,25 35,10 47,36 80,-12 96,0 50,65" fill="#1f3d2b"/>' +
         '</svg>';
       container.appendChild(div);
     }
