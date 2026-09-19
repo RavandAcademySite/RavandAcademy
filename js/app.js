@@ -206,35 +206,30 @@ function buildCertLayer(container, tpl, scale, data){
       const col = tpl.skillColumns[value];
       if (!col) return;
       const row = field.row;
-      // NOTE: an earlier version enlarged this box 1.5x (symmetric growth
-      // around the same center) to make the checkmark bigger, but every real
-      // exported PNG showed it rendered bigger AND shifted up-left instead of
-      // staying centered - html2canvas evidently doesn't rasterize that
-      // symmetric-overflow box the way a live browser preview does. Sizing
-      // the box to exactly match the printed ring (no enlarge) is the
-      // version that was confirmed well-centered in an actual export, so
-      // that's what we use.
-      // Overflow above the ring is intentional here, so the SVG must not
-      // clip to its viewBox.
+      const mark = tpl.checkMark;
+      // Center of the printed ring for this row/column.
+      const ringCx = col.x + col.w / 2;
+      const ringCy = row.y + row.h / 2;
+      // The tick is NOT centered in the ring: it is placed exactly like the
+      // approved reference (tick body inside the ring, long stroke sticking
+      // out to the top-right). The glyph's top-left = ring center + (dx, dy)
+      // (dx per column, dy per row - measured from the reference file);
+      // the div also carries the SVG's small safety margin (viewBox x/y).
+      const [vx, vy, vw, vh] = mark.viewBox;
+      const dx = col.checkDx !== undefined ? col.checkDx : mark.dx;
+      const dy = row.checkDy !== undefined ? row.checkDy : mark.dy;
       const div = document.createElement("div");
       div.className = "cert-check";
-      div.style.left   = (col.x * scale) + "px";
-      div.style.top    = (row.y * scale) + "px";
-      div.style.width  = (col.w * scale) + "px";
-      div.style.height = (row.h * scale) + "px";
-      // Real SVG checkmark (not a CSS clip-path shape) - html2canvas, used for
-      // the PNG/PDF export, does not reliably support clip-path and was
-      // rendering it as a near-invisible sliver. An inline <svg><polygon>
-      // rasterizes correctly every time. Color matches the printed ink
-      // (--green-900) instead of black. The shape is drawn so its bottom tip
-      // sits on the ring's center and the top-right arm pokes slightly
-      // outside the ring, like a hand-drawn checkmark rather than a shape
-      // squeezed to fit inside the circle.
+      // whole pixels so the export is crisp and identical everywhere
+      div.style.left   = Math.round((ringCx + dx + vx) * scale) + "px";
+      div.style.top    = Math.round((ringCy + dy + vy) * scale) + "px";
+      div.style.width  = (vw * scale) + "px";
+      div.style.height = (vh * scale) + "px";
+      // Inline SVG path (html2canvas can't do CSS clip-path, but rasterizes
+      // inline SVG reliably).
       div.innerHTML =
-        '<svg viewBox="0 0 100 100" width="100%" height="100%" ' +
-        'preserveAspectRatio="xMidYMid meet" style="overflow:visible;">' +
-        '<polygon points="17,25 35,10 47,36 80,-12 96,0 50,65" fill="#1f3d2b"/>' +
-        '</svg>';
+        `<svg viewBox="${mark.viewBox.join(" ")}" width="100%" height="100%" ` +
+        `preserveAspectRatio="none"><path d="${mark.path}" fill="${mark.color}"/></svg>`;
       container.appendChild(div);
     }
   });
