@@ -190,6 +190,9 @@ body{
   flex-direction:column;
   gap:14px;
 }
+.form-group{
+  margin-bottom:16px;
+}
 .form-group label{
   display:block;
   font-size:13px;
@@ -393,7 +396,8 @@ body{
   background:var(--green-50);
   color:var(--text-dark);
 }
-#bulkDownloadSampleBtn{ margin-bottom:4px; }
+#bulkDownloadSampleBtn{ margin-bottom:16px; }
+#bulkGenerateBtn{ margin-top:2px; }
 .bulk-status{
   margin-top:12px;
   font-size:13px;
